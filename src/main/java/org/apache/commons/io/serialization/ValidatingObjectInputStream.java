@@ -60,7 +60,7 @@ public class ValidatingObjectInputStream extends ObjectInputStream {
         // Reject has precedence over accept
         for(ClassNameMatcher m : rejectMatchers) {
             if(m.matches(name)) {
-                throw new InvalidClassException("Class name rejected");
+                invalidClassNameFound(name);
             }
         }
         
@@ -72,8 +72,22 @@ public class ValidatingObjectInputStream extends ObjectInputStream {
             }
         }
         if(!ok) {
-            throw new InvalidClassException("Class name not accepted");
+            invalidClassNameFound(name);
         }
+    }
+    
+    /** Called to throw InvalidClassException (by default) when an invalid
+     *  class name is found in deserialization. Can be overridden, for example
+     *  to log those class names.
+     *  By default the name of the invalid class is not included in the
+     *  exception thrown, as that might give too much information from a
+     *  security point of view.
+     *  
+     * @param className name of the invalid class 
+     * @throws InvalidClassException
+     */
+    protected void invalidClassNameFound(String className) throws InvalidClassException{
+        throw new InvalidClassException("Class name not accepted");
     }
 
     @Override

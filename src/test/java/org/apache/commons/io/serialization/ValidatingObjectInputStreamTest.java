@@ -209,4 +209,23 @@ public class ValidatingObjectInputStreamTest {
                 .reject(Integer.class)
         );
     }
+    
+    @Test(expected = RuntimeException.class)
+    public void customInvalidMethod() throws Exception {
+        class CustomVOIS extends ValidatingObjectInputStream {
+            CustomVOIS(InputStream is) throws IOException {
+                super(is);
+            }
+
+            @Override
+            protected void invalidClassNameFound(String className) throws InvalidClassException {
+                throw new RuntimeException("Custom exception");
+            }
+        };
+        
+        assertSerialization(
+                willClose(new CustomVOIS(testStream))
+                .reject(Integer.class)
+        );
+    }
 }
